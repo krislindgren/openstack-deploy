@@ -1,0 +1,15 @@
+---
+type: bootstrap
+image: centos-source-cinder-base
+base_service: cinder
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/cinder-bootstrap:/var/lib/kolla/config_files
+  - /var/log/cinder:/var/log/cinder
+notify: false
+run_command: "cinder-manage db sync"
+config_files:
+  - /var/lib/kolla/config_files/cinder.conf:/etc/cinder/cinder.conf
+permissions:
+  - /var/log/cinder

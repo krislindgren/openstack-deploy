@@ -1,0 +1,4 @@
+- include: common/make_new_api_container_active_in_lb.yml
+  when: (type == "api")
+- include: common/move_active_container_to_old.yml
+- include: common/move_new_container_to_active.yml

@@ -1,0 +1,17 @@
+---
+type: rpc
+image: centos-source-octavia-worker
+base_service: octavia
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/kolla/octavia-worker:/var/lib/kolla/config_files
+  - /var/log/octavia:/var/log/octavia
+notify: false
+run_command: "octavia-worker"
+config_files:
+  - /var/lib/kolla/config_files/octavia.conf:/etc/octavia/octavia.conf
+  - /var/lib/kolla/config_files/certs/private/cakey.pem:/etc/octavia/certs/private/cakey.pem
+  - /var/lib/kolla/config_files/certs/ca_01.pem:/etc/octavia/certs/ca_01.pem
+  - /var/lib/kolla/config_files/certs/client.pem:/etc/octavia/certs/client.pem
+permissions:
+  - /var/log/octavia

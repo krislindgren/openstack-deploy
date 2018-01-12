@@ -1,0 +1,3 @@
+---
+- name: Delete unused images | Delete all unused images
+  command: docker image prune -a -f

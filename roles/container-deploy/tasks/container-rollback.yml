@@ -1,0 +1,10 @@
+---
+- include_vars:
+    file: "vars/operations/rollback.yml"
+  when: rollback_on_failed_tests is not defined
+- include: common/test_rabbitmq_connectivity.yml
+  when: ( no_rabbit_is_fatal is defined and no_rabbit_is_fatal == True )
+- include: common/move_old_container_to_new.yml
+- include: "common/start_new_{{ type }}_container.yml"
+- include: container-test.yml
+- include: container-activate.yml

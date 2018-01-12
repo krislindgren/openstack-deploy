@@ -1,0 +1,8 @@
+---
+- include: common/create_new_service_container.yml
+- include: common/start_new_api_container.yml
+  when: (type == "api")
+- include: common/start_new_rpc_container.yml
+  when: (type == "rpc")
+- include: common/start_new_custom_container.yml
+  when: (type == "custom")

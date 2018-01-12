@@ -1,0 +1,18 @@
+---
+type: rpc
+image: centos-source-nova-cells
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-cells:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /tmp/nova-cells:/tmp/nova-cells
+notify: true
+run_command: "nova-cells"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+  - /var/lib/kolla/config_files/cells.json:/etc/nova/cells.json
+permissions:
+  - /var/log/nova
+  - /var/lib/nova

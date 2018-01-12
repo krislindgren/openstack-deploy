@@ -1,0 +1,16 @@
+---
+type: rpc
+image: centos-source-cinder-volume
+base_service: cinder
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/cinder-volume:/var/lib/kolla/config_files:ro
+  - /var/log/cinder:/var/log/cinder
+  - /tmp/cinder-volume:/tmp/cinder-volume
+notify: true
+run_command: "cinder-volume"
+config_files:
+  - /var/lib/kolla/config_files/cinder.conf:/etc/cinder/cinder.conf
+permissions:
+  - /var/log/cinder

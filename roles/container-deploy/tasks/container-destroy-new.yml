@@ -1,0 +1,8 @@
+---
+- name: Destroy _new container | Check if {{ service }}_active exists
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+
+- include: "common/rollback_new_{{ type }}_container.yml"
+  vars:
+    no_fail_msg: True

@@ -1,0 +1,13 @@
+---
+- name: Stop active container | Check if {{ service }}_active exists
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+  ignore_errors: true
+
+- name: Stop active container | Confirm ability to stop "{{ service }}"
+  fail: msg='Unable to find "{{ service }}_active" to stop'
+  when: "active_check.rc == 1"
+
+- name: Stop active container | Stopping "{{ service }}"
+  shell: /bin/docker stop "{{ service }}_active"
+  when: "active_check.rc == 0"

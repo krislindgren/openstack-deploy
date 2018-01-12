@@ -1,0 +1,6 @@
+- include: common/update_service_configuration.yml
+  when: (type == "bootstrap")
+- include: container-download-image.yml
+  when: (type == "bootstrap")
+- include: common/create_and_run_bootstrap_container.yml
+  when: (type == "bootstrap")

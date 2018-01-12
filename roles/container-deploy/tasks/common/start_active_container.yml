@@ -1,0 +1,13 @@
+---
+- name: Start active container | Check if {{ service }}_active exists
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+  ignore_errors: true
+
+- name: Start active container | Confirm ability to start "{{ service }}"
+  fail: msg='Unable to find "{{ service }}_active" to start'
+  when: "active_check.rc == 1"
+
+- name: Start active container | Start "{{ service }}"
+  shell: /bin/docker restart "{{ service }}_active"
+  when: "active_check.rc == 0"

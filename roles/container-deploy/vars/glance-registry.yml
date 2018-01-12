@@ -1,0 +1,24 @@
+---
+image: centos-source-glance-registry
+type: api
+base_service: glance
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/glance-registry:/var/lib/kolla/config_files:ro
+  - /var/lib/glance/images:/var/lib/glance/images
+  - /var/lib/glance/cache/:/var/lib/glance/cache
+  - /var/log/glance:/var/log/glance
+ports:
+  - 9191
+static_ip: 192.168.185.12
+notify: false
+run_command: "glance-registry"
+config_files:
+  - /var/lib/kolla/config_files/glance-registry.conf:/etc/glance/glance-registry.conf
+  - /var/lib/kolla/config_files/glance-registry-paste.ini-gd:/etc/glance/glance-registry-paste.ini
+  - /var/lib/kolla/config_files/glance-swift.conf:/etc/glance/glance-swift.conf
+  - /var/lib/kolla/config_files/glance-cache.conf:/etc/glance/glance-cache.conf
+permissions:
+  - /var/lib/glance
+  - /var/log/glance

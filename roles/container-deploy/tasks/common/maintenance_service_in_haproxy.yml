@@ -1,0 +1,11 @@
+---
+- name: Maintenance service in HAProxy  | {{ haproxy_action}} {{ service }}_active from active service in HAProxy, will wait up to 300 seconds to drain
+  haproxy:
+    state: "{{ haproxy_action }}d"
+    host: "{{ service }}_active"
+    socket: /var/run/haproxy.sock
+    backend: "{{ service }}-backend"
+    wait: yes
+    drain: yes
+    wait_interval: 5
+    wait_retries: 60 

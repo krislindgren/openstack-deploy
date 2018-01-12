@@ -1,0 +1,16 @@
+---
+type: rpc
+image: centos-source-cinder-scheduler
+base_service: cinder
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/cinder-scheduler:/var/lib/kolla/config_files:ro
+  - /var/log/cinder:/var/log/cinder
+  - /tmp/cinder-scheduler:/tmp/cinder-scheduler
+notify: true
+run_command: "cinder-scheduler"
+config_files:
+  - /var/lib/kolla/config_files/cinder.conf:/etc/cinder/cinder.conf
+permissions:
+  - /var/log/cinder

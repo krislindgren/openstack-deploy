@@ -1,0 +1,10 @@
+---
+- name: Download container image | Login to docker registry {{ docker_registry }} 
+  docker_login:
+    registry: "{{ docker_registry }}"
+    username: "{{ docker_registry_user}}"
+    password: "{{ docker_registry_password }}"
+    reauth: no
+- name: Download container image | Downloading the requested image {{ image }} with tag {{ image_tag }}
+  docker_image:
+    name: "{{ docker_registry }}/{{ image }}:{{ image_tag }}"

@@ -1,0 +1,58 @@
+---
+- name: Make active in LB | Test if {{ service }}_active exits
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+  ignore_errors: true
+
+# This should be able to be called, however thier must be a bug in ansible as the 
+# {{static_ip}} does not get expanded after the include here... commenting out
+#- include: maintenance_service_in_haproxy.yml haproxy_action=disable
+#  when: (type == "api")
+
+#remove this once the ansible bug is fixed and the task names are correctly re-interpreted after an include
+- name: Maintenance service in HAProxy  | Disable {{ service }}_active from active service in HAProxy, will wait up to 300 seconds to drain
+  haproxy:
+    state: "disabled"
+    host: "{{ service }}_active"
+    socket: /var/run/haproxy.sock
+    backend: "{{ service }}-backend"
+    wait: yes
+    drain: yes
+    wait_interval: 5
+    wait_retries: 60 
+
+- name: Make active in LB | Detach fixed ip {{ static_ip }} from {{ service }}_active container
+  docker_container:
+    name: "{{ service }}_active"
+    networks:
+      - name: bridge
+    purge_networks: yes
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+  when: "active_check.rc == 0"
+
+- name:  Make active in LB |  Ensure static_ip network is created
+  docker_network:
+    name: haproxy
+    ipam_options:
+      subnet: '192.168.185.0/24'
+      gateway: '192.168.185.1'
+    appends: yes
+
+- name: Make active in LB | Attach fixed ip {{ static_ip }} to {{ service }}_new container
+  docker_container:
+    name: "{{ service }}_new"
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+    networks:
+      - name: haproxy
+        ipv4_address: "{{ static_ip }}"
+        aliases:
+          - "{{ service }}_active"
+
+- include: maintenance_service_in_haproxy.yml haproxy_action=enable
+  when: (type == "api")

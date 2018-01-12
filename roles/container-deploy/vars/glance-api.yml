@@ -1,0 +1,26 @@
+---
+type: api
+image: centos-source-glance-api
+base_service: glance
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/glance-api:/var/lib/kolla/config_files
+  - /var/lib/glance/images:/var/lib/glance/images
+  - /var/lib/glance/cache/:/var/lib/glance/cache
+  - /var/log/glance:/var/log/glance
+ports:
+  - 9292
+static_ip: 192.168.185.11
+notify: false
+run_command: "glance-api"
+config_files:
+  - /var/lib/kolla/config_files/glance-api.conf:/etc/glance/glance-api.conf
+  - /var/lib/kolla/config_files/glance-api-paste.ini:/etc/glance/glance-api-paste.ini
+  - /var/lib/kolla/config_files/glance-swift.conf:/etc/glance/glance-swift.conf
+  - /var/lib/kolla/config_files/glance-cache.conf:/etc/glance/glance-cache.conf
+  - /var/lib/kolla/config_files//policy.d/0001.policy.json:/etc/glance/policy.d/0001.policy.json
+  - /var/lib/kolla/config_files//policy.d/0002.policy.json:/etc/glance/policy.d/0002.policy.json
+permissions:
+  - /var/lib/glance
+  - /var/log/glance

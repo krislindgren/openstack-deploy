@@ -1,0 +1,3 @@
+---
+- name: Make new container active | Move {{ service }}_new container to {{ service }}_active
+  command: /bin/docker rename "{{ service }}_new" "{{ service }}_active"

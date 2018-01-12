@@ -1,0 +1,17 @@
+---
+type: api
+image: centos-source-octavia-api
+base_service: octavia
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/kolla/octavia-api:/var/lib/kolla/config_files
+  - /var/log/octavia:/var/log/octavia
+ports:
+  - 9876
+static_ip: 192.168.185.61
+notify: false
+run_command: "octavia-api"
+config_files:
+  - /var/lib/kolla/config_files/octavia.conf:/etc/octavia/octavia.conf
+permissions:
+  - /var/log/octavia

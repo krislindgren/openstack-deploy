@@ -1,0 +1,3 @@
+---
+- include: common/maintenance_service_in_haproxy.yml haproxy_action=disable
+  when: (type == "api")

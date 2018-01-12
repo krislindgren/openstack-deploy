@@ -1,0 +1,22 @@
+---
+type: api
+image: centos-source-nova-spicehtml5proxy
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-spicehtml5proxy:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /etc/pki/tls/:/var/lib/kolla/config_files-tls:ro
+ports:
+  - 6082
+static_ip: 192.168.185.32
+notify: false
+run_command: "nova-spicehtml5proxy"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+  - /var/lib/kolla/config_files-tls/certs/cloud.crt:/etc/pki/tls/certs/cloud.crt
+  - /var/lib/kolla/config_files-tls/private/cloud.key:/etc/pki/tls/private/cloud.key
+permissions:
+  - /var/log/nova
+  - /var/lib/nova

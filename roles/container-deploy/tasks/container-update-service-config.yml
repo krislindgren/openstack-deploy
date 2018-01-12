@@ -1,0 +1,2 @@
+---
+- include: common/update_service_configuration.yml

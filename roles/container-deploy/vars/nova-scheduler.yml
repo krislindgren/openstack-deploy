@@ -1,0 +1,17 @@
+---
+type: rpc
+image: centos-source-nova-scheduler
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-scheduler:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /tmp/nova-scheduler:/tmp/nova-scheduler
+notify: true
+run_command: "nova-scheduler"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+permissions:
+  - /var/log/nova
+  - /var/lib/nova

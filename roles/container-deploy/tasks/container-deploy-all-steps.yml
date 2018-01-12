@@ -1,0 +1,11 @@
+---
+- include_vars:
+    file: "vars/operations/deploy.yml"
+  when: rollback_on_failed_tests is not defined
+- include: common/test_rabbitmq_connectivity.yml
+  when: ( no_rabbit_is_fatal is defined and no_rabbit_is_fatal == True )
+- include: container-download-image.yml
+- include: common/update_service_configuration.yml
+- include: container-create.yml
+- include: container-test.yml
+- include: container-activate.yml

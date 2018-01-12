@@ -1,0 +1,2 @@
+---
+rollback_on_failed_tests: True

@@ -1,0 +1,4 @@
+---
+- include: common/test_rabbitmq_connectivity.yml
+  when: ( no_rabbit_is_fatal is defined and no_rabbit_is_fatal == True )
+- include: common/start_active_container.yml

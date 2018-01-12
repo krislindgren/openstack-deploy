@@ -1,0 +1,37 @@
+---
+- name: Move active container to old | Check if {{ service }}_new container exists 
+  shell: /bin/docker ps -a | grep "{{ service }}_new"
+  register: new_check
+  ignore_errors: true
+
+- name: Move active container to old | Confirming {{ service }}_new container exists
+  fail: msg='No {{service}}_new  container found, cannot make _new container active.'
+  when: "new_check.rc == 1"
+
+- name: Move active container to old | Remove any {{ service }}_old containers
+  docker_container:
+     name: "{{ service }}_old"
+     state: absent
+
+- name: Move active container to old | Check if {{ service }}_active container exists
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+  ignore_errors: true
+
+#The following actions do not succesfully complete unless the active container
+#is stopped first.  Something about renaming the container and it not being 
+#able to find the sandbox the running container is working in.
+
+- name: Move active container to old | Stop {{ service }}_active container
+  docker_container:
+    name: "{{ service }}_active"
+    state: stopped
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+  when: "active_check.rc == 0"
+
+- name: Move active container to old | Move {{ service }}_active container to {{ service }}_old
+  command: /bin/docker rename "{{ service }}_active" "{{ service }}_old"
+  when: "active_check.rc == 0"

@@ -1,0 +1,48 @@
+---
+- name: Start new CUSTOM container | Check if {{ service }}_active exists
+  shell: /bin/docker ps -a | grep "{{ service }}_active"
+  register: active_check
+  ignore_errors: true
+
+- name: Start new CUSTOM container | Stop {{ service }}_active CUSTOM container
+  docker_container:
+    name: "{{ service }}_active"
+    state: stopped
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+  when: active_check.rc == 0
+
+- name: Start new CUSTOM container | Copy systemd_notify script, if it is supported by the service
+  copy: src=files/notify/systemd_notify.py dest=/tmp/systemd_notify.py mode=0755
+  when: notify == true
+
+- name: Start new CUSTOM container | Startup systemd_notify script,  waits 45 seconds
+  shell: python /tmp/systemd_notify.py {{ service }} 45
+  async: 45
+  poll: 0
+  when: notify == true
+  register: notify_sleeper
+
+- name: Start new CUSTOM container | Start {{ service }}_new CUSTOM container
+  docker_container:
+    name: "{{ service }}_new"
+    state: started
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+
+- name: Start new CUSTOM container | Wait for {{ service }}_new container to notify that it started.
+  async_status: jid={{ notify_sleeper.ansible_job_id }}
+  register: notify_result
+  until: notify_result.finished
+  retries: 45
+  delay: 1
+  when: "notify == true"
+  ignore_errors: true
+
+- name: Start new CUSTOM container | Rollback {{service }}_new container due to failed notfy on start
+  include: rollback_new_custom_container.yml
+  when: notify == true and notify_result.rc != 0

@@ -1,0 +1,20 @@
+---
+type: rpc
+image: centos-source-ceilometer-notification
+base_service: ceilometer
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/ceilometer-agent-notification:/var/lib/kolla/config_files:ro
+  - /var/log/ceilometer:/var/log/ceilometer
+  - /tmp/ceilometer-agent-notifcation:/tmp/ceilometer-agent-notifucation
+notify: false
+run_command: "ceilometer-agent-notification"
+config_files:
+  - /var/lib/kolla/config_files/ceilometer.conf:/etc/ceilometer/ceilometer.conf
+  - /var/lib/kolla/config_files/event_definitions.yaml:/etc/ceilometer/event_definitions.yaml
+  - /var/lib/kolla/config_files/event_pipeline.yaml:/etc/ceilometer/event_pipeline.yaml
+  - /var/lib/kolla/config_files/pipeline.yaml:/etc/ceilometer/pipeline.yaml
+permissions:
+  - /var/log/ceilometer
+sleep: 30

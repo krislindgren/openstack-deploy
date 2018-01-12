@@ -1,0 +1,17 @@
+---
+type: rpc
+image: centos-source-nova-base
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-cert:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /tmp/nova-cert:/tmp/nova-cert
+notify: true
+run_command: "nova-cert"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+permissions:
+  - /var/log/nova
+  - /var/lib/nova

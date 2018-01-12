@@ -1,0 +1,22 @@
+---
+type: api
+image: centos-source-nova-placement-api
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-placement-api:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /tmp/nova-placement-api:/tmp/nova-placement-api
+static_ip: 192.168.185.33
+ports:
+  - 8780
+notify: false
+run_command: "/usr/sbin/httpd -DFOREGROUND"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+  - /var/lib/kolla/config_files/placement-api-wsgi.conf:/etc/httpd/conf.d/placement-api-wsgi.conf
+  - /var/lib/kolla/config_files/policy.d/0001.policy.json:/etc/nova/policy.d/0001.policy.json
+  - /var/lib/kolla/config_files/policy.d/0002.policy.json:/etc/nova/policy.d/0002.policy.json
+permissions:
+  - /var/log/nova

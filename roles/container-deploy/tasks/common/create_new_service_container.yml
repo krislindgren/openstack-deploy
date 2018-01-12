@@ -1,0 +1,21 @@
+---
+- name: Create new container | Remove lingering {{ service }}_new container for service
+  docker_container:
+    name: "{{ service }}_new"
+    state: absent
+
+- name: Create new container | Create {{service}}_new docker container for {{ service }}
+  docker_container:
+    name: "{{ service }}_new"
+    state: present
+    image: "{{docker_registry}}/{{ image }}:{{ image_tag }}"
+    restart_policy: unless-stopped
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+    volumes:
+      "{{ volumes }}"
+    env:
+      KOLLA_CONFIG_STRATEGY=COPY_ONCE
+      NOTIFY_SOCKET="/tmp/{{ service }}/notify.socket"

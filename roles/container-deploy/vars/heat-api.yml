@@ -1,0 +1,24 @@
+---
+type: api
+image: centos-source-heat-api
+base_service: heat
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/heat-api:/var/lib/kolla/config_files
+  - /var/log/heat:/var/log/heat
+  - /etc/pki/tls/:/var/lib/kolla/config_files-tls:ro
+ports:
+  - 8004
+static_ip: 192.168.185.51
+notify: false
+run_command: "heat-api"
+config_files:
+  - /var/lib/kolla/config_files/heat.conf:/etc/heat/heat.conf
+  - /var/lib/kolla/config_files/api-paste.ini:/etc/heat/api-paste.ini
+  - /var/lib/kolla/config_files/policy.d/0001.policy.json:/etc/heat/policy.d/0001.policy.json
+  - /var/lib/kolla/config_files/policy.d/0002.policy.json:/etc/heat/policy.d/0002.policy.json
+  - /var/lib/kolla/config_files-tls/certs/cloud.crt:/etc/pki/tls/certs/cloud.crt
+  - /var/lib/kolla/config_files-tls/private/cloud.key:/etc/pki/tls/private/cloud.key
+permissions:
+  - /var/log/heat

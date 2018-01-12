@@ -1,0 +1,16 @@
+---
+- name: Test RabbitMQ connectivity | Test RabbitMQ connectivity before doing anything.
+  wait_for:
+    port: "5671"
+    state: started
+    host: "{{ item }}"
+    timeout: "{{ test_timeout | default ('60') }}"
+  with_items:
+    "{{ rabbitmq_servers[base_service] }}"
+  ignore_errors: true
+  register: test_result
+
+- name: Test RabbitMQ connectivity | Aborting {{ action }} on {{ service }} because Rabbitmq connectivity failed
+  fail:
+    msg: "Not able to connect to one or more rabbitmq servers.  Aborting because no_rabbit_is_fatal is true."
+  when: ( test_result.failed is defined and no_rabbit_is_fatal == True )

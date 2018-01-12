@@ -1,0 +1,6 @@
+---
+- include_vars: vars/operations/test.yml
+  when: rollback_on_failed_tests is not defined
+- include: "common/test_new_{{ type }}_container.yml"
+- include: "common/rollback_new_{{ type }}_container.yml"
+  when: test_result|failed  and rollback_on_failed_tests == True

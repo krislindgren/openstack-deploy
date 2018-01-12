@@ -1,0 +1,13 @@
+---
+- name: Test new RPC container | sleep {{ sleep | default('10') }} seconds if container doesn't notify it starts
+  shell: "sleep {{ sleep | default('10') }}"
+  when: notify == false
+
+- name: Test new RPC container | Get {{ service }}_new container PID
+  command: "docker inspect -f {% raw %} '{{.State.Pid}}' {% endraw %} {{ service }}_new"
+  register: container_pid
+
+- name: Test new RPC container | Test {{ service }}_new rpc container is connected to one or more rabbitmq_servers
+  shell: "nsenter -t {{ container_pid.stdout }}  -n netstat -alnp | grep ESTABLISHED | egrep -w -e '{{ rabbitmq_servers[base_service] | join('|') }}'"
+  ignore_errors: true
+  register: test_result

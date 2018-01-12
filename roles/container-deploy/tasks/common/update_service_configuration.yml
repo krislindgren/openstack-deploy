@@ -1,0 +1,18 @@
+---
+- name: Update configuration | Run puppet to update configuration for {{ service }}
+  command: "/etc/puppet/environments/master/tools/deploy-puppet --branch all_containers --hierabranch {{ base_service }}_containers --tags {{ base_service }}-config"
+  when: run_puppet
+
+- name: Update configuration | Create /etc/kolla if it doesn't exist
+  file:
+    path: /etc/kolla
+    state: directory
+    mode: 0755
+
+- name: Update configuration | Copy config files to /etc/kolla/{{ service }}
+  command: rsync -aHAX --ignore-errors --force /etc/{{ base_service }}/ /etc/kolla/{{ service }}/
+
+- name: Update configuration | Create config.json in /etc/kolla/{{ service }}
+  template:
+    src: files/config/config.json.j2
+    dest: "/etc/kolla/{{ service }}/config.json"

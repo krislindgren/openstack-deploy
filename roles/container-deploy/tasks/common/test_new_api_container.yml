@@ -1,0 +1,24 @@
+---
+- name: Test New API container | Get containers {{ service }}_new docker IP
+  command: "docker inspect -f {% raw %}'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' {% endraw %} {{ service }}_new"
+  register: container_ip
+
+- name: Test New API container | Wait for {{ service }}_new to be listening on its correct port
+  wait_for:
+    port: "{{ item }}"
+    state: started
+    host: "{{ container_ip.stdout }}"
+    timeout: "{{ test_timeout | default ('60') }}"
+  with_items:
+   "{{ ports }}"
+  register: port_status
+  ignore_errors: true
+
+- name: Test New API container | Rolling back {{ service }}_new api container, port didn't become available
+  include: rollback_new_api_container.yml
+  when: ( port_status.failed is defined  and rollback_on_failed_tests == True )
+
+- name: Test New API container | Run {{ service }} specific api test script
+  script: "files/testing/{{ service }} {{ container_ip.stdout }}"
+  ignore_errors: true
+  register: test_result

@@ -1,0 +1,26 @@
+---
+type: api
+image: centos-source-keystone-base
+base_service: keystone
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/keystone-main:/var/lib/kolla/config_files:ro
+  - /etc/els:/var/lib/kolla/config_files_els:ro
+  - /var/log/keystone:/var/log/keystone
+  - /var/log/httpd:/var/log/httpd
+ports:
+  - 5000
+static_ip: 192.168.185.2
+notify: false
+run_command: "/usr/sbin/httpd -DFOREGROUND"
+config_files:
+#  - /var/lib/kolla/config_files/domains/keystone.heat.conf:/etc/keystone/domains/keystone.heat.conf
+#  - /var/lib/kolla/config_files/keystone-paste.ini:/etc/keystone/keystone-paste.ini
+  - /var/lib/kolla/config_files/keystone.conf:/etc/keystone/keystone.conf
+  - /var/lib/kolla/config_files/wsgi-keystone-main.conf:/etc/httpd/conf.d/wsgi-keystone-main.conf
+  - /var/lib/kolla/config_files_els/els_smdb_client.conf:/etc/els/els_smdb_client.conf
+  - /var/lib/kolla/config_files_els/els_cmdb_client.conf:/etc/els/els_cmdb_client.conf
+permissions:
+  - /var/log/keystone
+  - /var/log/httpd

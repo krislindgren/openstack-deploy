@@ -1,0 +1,33 @@
+---
+- name: Create and run bootstrap container | Remove lingering {{ service }} container for {{ base_service }}
+  docker_container:
+    name: "{{ service }}"
+    state: absent
+
+- name: Create and run bootstrap container | Create {{service}} docker container for {{ base_service }}
+  docker_container:
+    name: "{{ service }}"
+    state: started
+    image: "{{docker_registry}}/{ image }}:{{ image_tag }}"
+    restart_policy: false
+    privileged: "{{ privileged | default('false') }}"
+    network_mode: "{{ network_mode | default(omit) }}"
+    pid_mode: "{{ pid_mode | default(omit) }}"
+    ipc_mode: "{{ ipc_mode | default(omit) }}"
+    detach: False
+    volumes:
+      "{{ volumes }}"
+    env:
+      KOLLA_CONFIG_STRATEGY=COPY_ONCE
+      NOTIFY_SOCKET="/tmp/{{ service }}/notify.socket"
+
+- name: Create and run bootstrap container | Get bootstrap logs from  {{ service }} docker container for {{ base_service }}
+  shell: "docker logs {{ service }}"
+  register: bootstrap_logs
+
+- debug: var=bootstrap_logs.stdout_lines
+
+- name: Create and run bootstrap container | Remove {{ service }} container
+  docker_container:
+    name: "{{ service }}"
+    state: absent

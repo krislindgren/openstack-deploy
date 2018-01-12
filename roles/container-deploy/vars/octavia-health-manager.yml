@@ -1,0 +1,20 @@
+---
+type: custom
+image: centos-source-octavia-health-manager
+base_service: octavia
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/kolla/octavia-health-manager:/var/lib/kolla/config_files
+  - /var/log/octavia:/var/log/octavia
+notify: false
+network_mode: host
+run_command: "octavia-health-manager"
+config_files:
+  - /var/lib/kolla/config_files/octavia.conf:/etc/octavia/octavia.conf
+  - /var/lib/kolla/config_files/octavia-logging.conf:/etc/octavia/octavia-logging.conf
+  - /var/lib/kolla/config_files/tls/ca.key:/etc/octavia_tls/ca.key
+  - /var/lib/kolla/config_files/tls/ca.crt:/etc/octavia_tls/ca.crt
+  - /var/lib/kolla/config_files/tls/client.crt:/etc/octavia_tls/client.crt
+permissions:
+  - /var/log/octavia
+container_checkcmd: "netstat -lnpu | grep 5555"

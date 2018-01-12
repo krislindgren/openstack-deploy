@@ -1,0 +1,105 @@
+---
+# With a role of container-deploy defined this playbook needs the following things passed in on command line:
+# -l <hosts that you want this to be limited too>
+
+# service: <what service you want to do something against>
+# tag: <what image tag to use for the image, when deploying a container>
+# operation: <see list below for valid actions>
+# strategy: [ free | linear]
+#   Free - runs all commands in completion on each node as fast as possible
+#   Linear - runs each play in a playbook across all specified nodes
+#            waiting for all nodes to be completed before doing the next action
+# rollback_on_failed_tests: [ True| False ]
+#   True - If any of the tests fail, right then destroy the new container and fail a deployment, or in RPC kill the _new container
+#          and make sure _active is running
+#   False - If any of the tests fail, continue on as if they succeeded - In some deployment actions this will make a container that
+#           failed tests active in service, specifically when used with container-deploy-all-steps, or calling container-test with it.
+#           In these cases, if you wanted to handle destroying the container yourself, you need to either A) do a new deployment or
+#           B) use the container-destroy-new command.
+# test_timeout: <seconds> - Amount of time to wait for tests to complete or ports to become available
+#
+#valid operations:
+# container-activate
+#  - Add's the container to the host LB. Moves the _new container to _active, renames the _active container to _old and stops it.
+# container-download-image
+#  - Ensures that we can login to the artificatory rep and downloads the specified image on the node.
+# container-start
+#  - Starts the current _active container.
+# container-stop
+#  - Stops the current _active container.
+# container-restart
+#  - Restarts the container that _active
+# container-rollback
+#  - Moves the _old service to _new, starts it, tests it, moves it to _active.  Moves current _active service to _old.
+# container-create
+#  - Creates a _new container for the service
+# container-test
+#  - Runs tests to make sure the _new container for a service roughly works
+# container-update-service-config
+#  - Runs puppet with tags specific to the service passed in.
+#  - To change the running config you need to deploy a new container after updating the config.  Config in containers is immutable.
+# container-maintenance
+#  - Disables the service in HAProxy on the host
+# container-unmaintenance
+#  - Enables the service in HAProxy on the host
+# container-destroy-new
+# - Destroys any _new container, if the _active container for RPC exits, it makes sure it is running
+#
+# container-deploy-all-steps does:
+#  - container-update-service-config
+#  - container-download-image
+#  - container-start
+#  - container-test
+#  - container-activate
+#
+# container-deploy does:
+#   - container-update-service-config
+#   - container-download-image
+#   - container-start
+#
+# Varriables that comes from group_vars or inventory:
+# rabbitmq_servers - List of server:port to test to ensure connectivity works or is established for RPC services tests
+#    In group_var (yaml) format it is like:
+#    rabbitmq_servers:
+#      nova:
+#        - 10.224.48.130:5671
+#        - 10.224.48.130:5671
+#      neutron:
+#        - 10.224.48.129:5671
+#
+#    In dynamic_inventory (json) format it is like:
+#    {
+#      "rabbitmq_servers": {
+#        "nova": [
+#          "10.224.48.130:5671",
+#          "10.224.48.130:5671"
+#        ],
+#        "neutron": [
+#          "10.224.48.129:5671"
+#        ]
+#      }
+#    }
+#
+# 
+#
+# Usage:
+# example: ansible-playbook container-deploy.yml -i `which render-ansible` -l glance -e "operation=container-deploy-all-steps image_tag=glance.11.0.2.dev18.55 service=glance-registry"
+# example: ansible-playbook container-deploy.yml -i `which render-ansible` -l glance -e "operation=container-restart image_tag=glance.11.0.2.dev18.55 service=glance-registry"
+
+- hosts:
+   - all
+  strategy: "{{ strategy | default('free') }}"
+  roles:
+   - { role: container-deploy,
+       tag: container }
+  vars:
+    service: "nova-api"
+    image_tag: "latest"
+    operation: "container-deploy-all-steps"
+    run_puppet: false
+    docker_registry: "someregistry.com"
+    docker_registry_user: "someuser"
+    docker_registry_password: "somepassword"
+  user: some_user
+  become: yes
+  become_user: root

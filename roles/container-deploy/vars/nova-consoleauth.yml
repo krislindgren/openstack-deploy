@@ -1,0 +1,17 @@
+---
+type: rpc
+image: centos-source-nova-consoleauth
+base_service: nova
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/nova-consoleauth:/var/lib/kolla/config_files:ro
+  - /var/log/nova:/var/log/nova
+  - /tmp/nova-consoleauth:/tmp/nova-consoleauth
+notify: true
+run_command: "nova-consoleauth"
+config_files:
+  - /var/lib/kolla/config_files/nova.conf:/etc/nova/nova.conf
+permissions:
+  - /var/log/nova
+  - /var/lib/nova

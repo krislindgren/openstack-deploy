@@ -1,0 +1,2 @@
+---
+- include: common/stop_active_container.yml

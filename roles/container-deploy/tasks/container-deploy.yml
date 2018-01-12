@@ -1,0 +1,7 @@
+---
+- include_vars:
+    file: "vars/operations/deploy.yml"
+  when: rollback_on_failed_tests is not defined
+- include: container-download-image.yml
+- include: common/update_service_configuration.yml
+- include: container-create.yml

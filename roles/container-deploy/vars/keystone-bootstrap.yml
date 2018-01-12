@@ -1,0 +1,15 @@
+---
+type: bootstrap
+image: centos-source-keystone-base
+base_service: keystone
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/keystone-bootstrap:/var/lib/kolla/config_files:ro
+  - /var/log/keystone:/var/log/keystone
+notify: false
+run_command: "keystone-manage db_sync"
+config_files:
+  - /var/lib/kolla/config_files/keystone.conf:/etc/keystone/keystone.conf
+permissions:
+  - /var/log/keystone

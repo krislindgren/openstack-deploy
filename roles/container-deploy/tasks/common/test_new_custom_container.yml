@@ -1,0 +1,13 @@
+---
+- name: Test new CUSTOM container | sleep {{ sleep | default('10') }} seconds if container doesn't notify it starts
+  shell: "sleep {{ sleep | default('10') }}"
+  when: notify == false
+
+- name: Test new CUSTOM container | Get {{ service }}_new container PID
+  command: "docker inspect -f {% raw %} '{{.State.Pid}}' {% endraw %} {{ service }}_new"
+  register: container_pid
+
+- name: Test new CUSTOM container | Test {{ service }}_new custom container check
+  shell: "nsenter -t {{ container_pid.stdout }}  -n {{ container_checkcmd }}"
+  ignore_errors: true
+  register: test_result

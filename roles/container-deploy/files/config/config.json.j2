@@ -1,0 +1,22 @@
+{
+    "command": "{{ run_command }}",
+    "config_files": [
+    {% for config in config_files -%}
+        {
+            "source": "{{ config.split(':')[0] }}",
+            "dest": "{{ config.split(':')[1] }}",
+            "owner": "{{ base_service }}",
+            "perm": "0600"
+        }{% if not loop.last -%},{% endif -%}
+    {% endfor %}
+    ],
+    "permissions": [
+    {% for perm in permissions -%}
+        {
+            "path": "{{ perm }}",
+            "owner": "{{ base_service }}:{{ base_service }}",
+            "recurse": true
+        }{% if not loop.last -%},{% endif -%}
+    {% endfor %}
+    ]
+}

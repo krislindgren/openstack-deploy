@@ -1,0 +1,18 @@
+---
+image: centos-source-glance-base
+type: bootstrap
+base_service: glance
+volumes:
+  - /etc/localtime:/etc/localtime:ro
+  - /etc/hosts:/etc/hosts
+  - /etc/kolla/glance-bootstrap:/var/lib/kolla/config_files:ro
+  - /var/log/glance:/var/log/glance
+notify: false
+run_command: "glance-manage db_sync"
+config_files:
+  - /var/lib/kolla/config_files/glance-registry.conf:/etc/glance/glance-registry.conf
+  - /var/lib/kolla/config_files/glance-registry-paste.ini:/etc/glance/glance-registry-paste.ini
+  - /var/lib/kolla/config_files/glance-swift.conf:/etc/glance/glance-swift.conf
+  - /var/lib/kolla/config_files/glance-cache.conf:/etc/glance/glance-cache.conf
+permissions:
+  - /var/log/glance

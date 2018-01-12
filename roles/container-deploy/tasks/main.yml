@@ -1,0 +1,5 @@
+---
+- include_vars:
+    file: "vars/{{ service }}.yml"
+- include: "{{ operation }}.yml"
+  static: yes
